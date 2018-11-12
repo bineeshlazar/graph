@@ -1,5 +1,12 @@
 package graph
 
+import (
+	"log"
+	"os"
+)
+
+var logger = log.New(os.Stdout, "graph:", log.Ldate|log.Ltime|log.Lshortfile)
+
 // Node represents
 type Node interface {
 	ID() string
@@ -9,17 +16,35 @@ type Node interface {
 type Edge interface {
 	From() Node
 	To() Node
-	GetWeight() float32
+	Weight() float32
+	SetWeight(float32)
 }
 
-// Graph represents a graph
+// Graph represents a graph,
 type Graph interface {
-	AddNode(node Node) bool
-	AddEdge(from, to Node, weight float32) bool
-	RemoveNode(node Node) error
-	RemoveEdge(edge Edge) error
-	GetNode(ID string) (Node, error)
+	// AddNode adds a node. Returns false if node already present
+	AddNode(node Node) (bool, error)
+
+	// AddEdge adds a conection between two nodes.
+	// Returns false if edge already present.
+	// Weight will be modified if edge already present
+	AddEdge(from, to string, weight float32) (bool, error)
+
+	// RemoveNode  removes a node from graph.
+	RemoveNode(ID string) error
+
+	// RemoveEdge removes a edge
+	RemoveEdge(from, to string) error
+
+	//GetNode gets a node from graph
+	GetNode(ID string) Node
+
+	// GetEdge get a edge from graph
 	GetEdge(from, to string) (Edge, error)
+
+	// Get number of nodes
 	GetNodeCount() int
-	GetEdges(node Node) ([]Edge, error)
+
+	// Get map of edges going from node 'ID'
+	GetEdges(ID string) (map[string]Edge, error)
 }

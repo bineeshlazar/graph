@@ -18,6 +18,7 @@ type Edge interface {
 	To() Node
 	Weight() float32
 	SetWeight(float32)
+	String() string
 }
 
 // Graph represents a graph,
@@ -47,4 +48,7 @@ type Graph interface {
 
 	// Get map of edges going from node 'ID'
 	GetEdges(ID string) (map[string]Edge, error)
+
+	// Get all nodes in graph
+	GetNodes() []Node
 }

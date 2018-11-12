@@ -1,5 +1,9 @@
 package graph
 
+import (
+	"fmt"
+)
+
 // Edge represents a connection between two nodes
 type edge struct {
 	from   Node
@@ -30,4 +34,8 @@ func (e *edge) Weight() float32 {
 
 func (e *edge) SetWeight(w float32) {
 	e.weight = w
+}
+
+func (e *edge) String() string {
+	return fmt.Sprintf("(%s)--%f-->(%s)", e.from.ID(), e.weight, e.to.ID())
 }

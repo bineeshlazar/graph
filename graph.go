@@ -153,3 +153,11 @@ func (g *graph) GetEdges(ID string) (map[string]Edge, error) {
 
 	return info.edges, nil
 }
+
+func (g *graph) GetNodes() []Node {
+	nodes := make([]Node, 0, len(g.nodes))
+	for _, n := range g.nodes {
+		nodes = append(nodes, n)
+	}
+	return nodes
+}

@@ -25,11 +25,14 @@ func NewGraph() Graph {
 }
 
 func (g *graph) AddNode(node Node) (bool, error) {
-	if _, found := g.nodes[node.ID()]; found {
+	n := g.GetNode(node.ID())
+	if n != nil {
 		logger.Printf("Node %s already present\n", node.ID())
 		return false, nil
 	}
+	g.lock.Lock()
 	g.nodes[node.ID()] = &nodeInfo{Node: node, edges: make(map[string]Edge)}
+	g.lock.Unlock()
 	return true, nil
 }
 
@@ -50,7 +53,9 @@ func (g *graph) AddEdge(from, to string, weight float32) (bool, error) {
 	if e == nil {
 		newEdge = true
 		e = NewEdge(fromNode, toNode, weight)
+		g.lock.Lock()
 		g.nodes[from].edges[to] = e
+		g.lock.Unlock()
 	} else {
 		e.SetWeight(weight)
 	}
@@ -66,7 +71,9 @@ func (g *graph) RemoveNode(ID string) error {
 		return err
 	}
 
+	g.lock.Lock()
 	delete(g.nodes, ID)
+	g.lock.Unlock()
 	return nil
 }
 
@@ -84,12 +91,16 @@ func (g *graph) RemoveEdge(from, to string) error {
 		return err
 	}
 
+	g.lock.Lock()
 	delete(g.nodes[from].edges, to)
+	g.lock.Unlock()
 	return nil
 }
 
 func (g *graph) GetNode(ID string) Node {
+	g.lock.RLock()
 	n, found := g.nodes[ID]
+	g.lock.RUnlock()
 	if !found {
 		return nil
 	}
@@ -113,11 +124,15 @@ func (g *graph) GetEdge(from, to string) (Edge, error) {
 		return nil, err
 	}
 
+	g.lock.RLock()
 	e, _ := info.edges[to]
+	g.lock.RUnlock()
 	return e, nil
 }
 
 func (g *graph) GetNodeCount() int {
+	g.lock.RLock()
+	defer g.lock.RUnlock()
 	return len(g.nodes)
 }
 
